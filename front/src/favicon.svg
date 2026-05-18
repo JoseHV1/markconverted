@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+
+  <!-- Background: rounded square, brand dark blue -->
+  <rect width="512" height="512" rx="90" fill="#003d80"/>
+
+  <!-- Left curly brace { -->
+  <path fill="white" d="
+    M 192 108
+    H 158 Q 108 108 108 158
+    V 224 Q 108 256 72 256
+    Q 108 256 108 288
+    V 354 Q 108 404 158 404
+    H 192 V 374
+    H 168 Q 138 374 138 354
+    V 292 Q 138 270 112 256
+    Q 138 242 138 220
+    V 158 Q 138 138 168 138
+    H 192 Z
+  "/>
+
+  <!-- Letter M -->
+  <path fill="white" d="
+    M 208 108 H 244 L 256 280 L 268 108
+    H 304 V 404
+    H 272 V 214 L 256 390 L 240 214
+    V 404 H 208 Z
+  "/>
+
+  <!-- Right curly brace } (mirror of left around x=256) -->
+  <path fill="white" d="
+    M 320 108
+    H 354 Q 404 108 404 158
+    V 224 Q 404 256 440 256
+    Q 404 256 404 288
+    V 354 Q 404 404 354 404
+    H 320 V 374
+    H 344 Q 374 374 374 354
+    V 292 Q 374 270 400 256
+    Q 374 242 374 220
+    V 158 Q 374 138 344 138
+    H 320 Z
+  "/>
+
+</svg>

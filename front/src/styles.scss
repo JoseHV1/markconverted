@@ -1,0 +1,391 @@
+// Bootstrap SCSS (use @use to avoid Sass deprecation)
+@use 'bootstrap/scss/bootstrap' as *;
+
+// ============================================================
+// CSS CUSTOM PROPERTIES (set by AppInitializer at runtime)
+// ============================================================
+
+:root {
+  // ── Primary: Azul Tecnológico ────────────────────────────────
+  // Light tints → action blue → navy
+  --primary-100: #d7e2ff;    // primary-fixed
+  --primary-200: #bbd0ff;    // on-primary-container
+  --primary-300: #acc7ff;    // inverse-primary
+  --primary-400: #4d88d9;    // intermediate
+  --primary-500: #0056b3;    // primary-container — main action color (CTAs, links)
+  --primary-600: #004491;    // on-primary-fixed-variant
+  --primary-700: #003f87;    // primary — structural (titles, logo, header bg dark)
+  --primary-800: #002d6b;    // benefits section bg
+  --primary-900: #001a40;    // on-primary-fixed
+  --primary-1000: #000d26;   // deepest navy
+
+  // ── Secondary: Blue medium ───────────────────────────────────
+  --secondary-100: #d7e2ff;
+  --secondary-200: #abc7ff;
+  --secondary-300: #8bb4fe;
+  --secondary-400: #5a8fd4;
+  --secondary-500: #325ea2;  // secondary base
+  --secondary-600: #124589;
+  --secondary-700: #0f4487;
+  --secondary-800: #001b3f;
+  --secondary-900: #001030;
+  --secondary-1000: #000820;
+
+  // ── Tertiary: Teal accent ────────────────────────────────────
+  --tertiary-100: #b2f5e8;
+  --tertiary-200: #58fbda;
+  --tertiary-300: #2cdebf;
+  --tertiary-400: #00d1b2;   // main teal — install btn, accent highlights
+  --tertiary-500: #00b89c;
+  --tertiary-600: #009e86;
+  --tertiary-700: #006555;   // tertiary-container
+  --tertiary-800: #004b3f;   // tertiary
+
+  // ── Semantic ────────────────────────────────────────────────
+  --color-error: #ba1a1a;
+  --color-error-light: #ffdad6;
+  --color-error-dark: #93000a;
+
+  --color-success: #22c55e;
+  --color-success-light: #dcfce7;
+  --color-success-dark: #15803d;
+
+  --color-warning: #f59e0b;
+  --color-warning-light: #fef3c7;
+  --color-warning-dark: #b45309;
+
+  --color-info: #38bdf8;
+  --color-info-light: #e0f2fe;
+  --color-info-dark: #0369a1;
+
+  // ── Neutrals: on-surface palette ────────────────────────────
+  --neutral-0:    #ffffff;
+  --neutral-100:  #f8f9fa;   // surface / background (canvas)
+  --neutral-200:  #edeeef;   // surface-container
+  --neutral-300:  #c2c6d4;   // outline-variant
+  --neutral-400:  #727784;   // outline
+  --neutral-500:  #424752;   // on-surface-variant
+  --neutral-600:  #2e3132;   // inverse-surface
+  --neutral-700:  #252829;
+  --neutral-800:  #191c1d;   // on-surface
+  --neutral-900:  #0d0f0f;
+  --neutral-1000: #050607;
+
+  // ── Surface tokens (Material Design) ─────────────────────────
+  --surface:                  #f8f9fa;
+  --surface-bright:           #f8f9fa;
+  --surface-dim:              #d9dadb;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low:    #f3f4f5;
+  --surface-container:        #edeeef;
+  --surface-container-high:   #e7e8e9;
+  --surface-container-highest:#e1e3e4;
+  --surface-variant:          #e1e3e4;
+  --on-surface:               #191c1d;
+  --on-surface-variant:       #424752;
+  --outline:                  #727784;
+  --outline-variant:          #c2c6d4;
+  --inverse-surface:          #2e3132;
+  --inverse-on-surface:       #f0f1f2;
+
+  // ── Dark navy (dark mode shell) ──────────────────────────────
+  --navy-900: #010d1f;   // dark mode base
+  --navy-800: #041527;   // dark mode hero / panel headers
+  --navy-700: #061e38;   // dark mode panels
+  --navy-600: #143558;   // dark mode borders
+
+  // ── Alias tokens ────────────────────────────────────────────
+  --color-bg:              var(--neutral-100);        // #f8f9fa
+  --color-surface:         var(--neutral-0);          // #ffffff
+  --color-border:          var(--outline-variant);    // #c2c6d4
+  --color-text:            var(--on-surface);         // #191c1d
+  --color-text-muted:      var(--on-surface-variant); // #424752
+  --color-text-on-primary: #ffffff;
+  --color-text-on-secondary: #ffffff;
+
+  // ── Sidebar ─────────────────────────────────────────────────
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 70px;
+  --sidebar-bg: var(--primary-800);
+  --sidebar-text: var(--neutral-300);
+  --sidebar-active-bg: var(--primary-500);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.06);
+
+  // ── Navbar ──────────────────────────────────────────────────
+  --navbar-height: 64px;
+  --navbar-bg: var(--color-surface);
+  --navbar-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+
+  // ── Radius — 4px base system ──────────────────────────────────
+  --radius-xs:  0.125rem;  // 2px
+  --radius-sm:  0.25rem;   // 4px  (buttons, small elements)
+  --radius-md:  0.375rem;  // 6px  (inputs, tags)
+  --radius-lg:  0.5rem;    // 8px  (cards, panels)
+  --radius-xl:  0.75rem;   // 12px (large containers)
+  --radius-2xl: 9999px;    // full (pills)
+
+  // ── Shadow ───────────────────────────────────────────────────
+  --shadow-sm: 0 1px 3px rgba(0, 61, 128, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 61, 128, 0.10);
+  --shadow-lg: 0 8px 24px rgba(0, 61, 128, 0.12);
+
+  // ── Transitions ──────────────────────────────────────────────
+  --transition-fast:   150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow:   400ms ease;
+}
+
+// ============================================================
+// GLOBAL RESETS & BASE
+// ============================================================
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ============================================================
+// TYPOGRAPHY — Inter scale matching Azul Tecnológico system
+// ============================================================
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--on-surface);
+}
+
+h1 { font-size: 2.5rem;   font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+h2 { font-size: 2rem;     font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; }
+h3 { font-size: 1.5rem;   font-weight: 600; line-height: 1.35; }
+h4 { font-size: 1.125rem; font-weight: 600; }
+h5 { font-size: 1rem;     font-weight: 600; }
+h6 { font-size: 0.875rem; font-weight: 600; }
+
+a {
+  color: var(--primary-500);   // #0056b3
+  text-decoration: none;
+
+  &:hover {
+    color: var(--primary-600); // #004491
+  }
+}
+
+// ============================================================
+// COMPONENT STYLES
+// ============================================================
+
+.app-card {
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.btn-primary {
+  background-color: var(--primary-500) !important;   // #0056b3
+  border-color: var(--primary-500) !important;
+  color: var(--color-text-on-primary) !important;
+  border-radius: var(--radius-sm) !important;
+
+  &:hover {
+    background-color: var(--primary-600) !important;
+    border-color: var(--primary-600) !important;
+  }
+
+  &:active {
+    background-color: var(--primary-700) !important;
+  }
+}
+
+.btn-secondary {
+  background-color: var(--secondary-500) !important;
+  border-color: var(--secondary-500) !important;
+  color: var(--color-text-on-secondary) !important;
+  border-radius: var(--radius-sm) !important;
+
+  &:hover {
+    background-color: var(--secondary-600) !important;
+    border-color: var(--secondary-600) !important;
+  }
+}
+
+.btn-outline-primary {
+  color: var(--primary-500) !important;
+  border-color: var(--primary-500) !important;
+  border-radius: var(--radius-sm) !important;
+
+  &:hover {
+    background-color: var(--primary-500) !important;
+    color: var(--color-text-on-primary) !important;
+  }
+}
+
+.badge-active {
+  background-color: var(--color-success-light);
+  color: var(--color-success-dark);
+  border: 1px solid var(--color-success);
+  border-radius: var(--radius-xs);
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-inactive {
+  background-color: var(--surface-container-high);
+  color: var(--neutral-600);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-xs);
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.app-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--color-surface);
+
+  thead {
+    background-color: var(--neutral-100);
+
+    th {
+      padding: 0.875rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.8125rem;
+      color: var(--neutral-600);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--color-border);
+    }
+  }
+
+  tbody tr {
+    transition: background-color var(--transition-fast);
+
+    &:hover {
+      background-color: var(--primary-100);
+    }
+
+    td {
+      padding: 0.875rem 1rem;
+      font-size: 0.9375rem;
+      color: var(--color-text);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
+}
+
+.form-control, .form-select {
+  border-color: var(--outline-variant) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--on-surface) !important;
+  background-color: var(--surface-container-lowest) !important;
+
+  &:focus {
+    border-color: var(--primary-500) !important;
+    box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.15) !important;
+  }
+
+  &.is-invalid {
+    border-color: var(--color-error) !important;
+  }
+
+  &::placeholder {
+    color: var(--outline) !important;
+    opacity: 1;
+  }
+}
+
+::placeholder {
+  color: var(--outline);
+  opacity: 1;
+}
+
+.form-label {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--neutral-700);
+  margin-bottom: 0.375rem;
+}
+
+.loading-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: var(--primary-500);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--color-text-muted);
+
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.4;
+  }
+
+  h4 {
+    color: var(--neutral-700);
+    margin-bottom: 0.5rem;
+  }
+}
+
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-container-low);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--outline-variant);
+  border-radius: 3px;
+
+  &:hover {
+    background: var(--outline);
+  }
+}
+
+// ============================================================
+// DARK MODE — body-level (synced from app dark mode toggle)
+// ============================================================
+
+body.dark-mode {
+  background-color: var(--navy-900) !important;
+  color: #e2eeff;
+
+  &::-webkit-scrollbar-track { background: var(--navy-800); }
+  &::-webkit-scrollbar-thumb {
+    background: var(--navy-600);
+    &:hover { background: #1e4d7a; }
+  }
+}
