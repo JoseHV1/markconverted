@@ -1,5 +1,4 @@
 import { Component, Input, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DarkModeService } from '../../services/dark-mode.service';
 import { PwaInstallService } from '../../services/pwa-install.service';
@@ -9,7 +8,7 @@ export type ActivePage = 'tools' | 'editor' | 'history';
 @Component({
   selector: 'app-site-header',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [RouterLink],
   host: { '[class.dark-mode]': 'darkMode.darkMode()' },
   template: `
 <header class="site-header">

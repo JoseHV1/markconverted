@@ -1,6 +1,5 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { CONVERSION_OPTIONS, ConversionOption } from '../converter/models/converter.models';
 import { CONVERSION_ICONS, CONVERSION_META } from '../converter/models/converter.meta';
 import { DarkModeService } from '../shared/services/dark-mode.service';
@@ -10,7 +9,7 @@ import { SiteFooterComponent } from '../shared/components/site-footer/site-foote
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, RouterLink, SiteHeaderComponent, SiteFooterComponent],
+  imports: [RouterLink, SiteHeaderComponent, SiteFooterComponent],
   host: { '[class.dark-mode]': 'darkModeService.darkMode()' },
   template: `
 <app-site-header activePage="tools"></app-site-header>

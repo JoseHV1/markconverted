@@ -1,7 +1,6 @@
 ﻿import {
   Component, OnInit, OnDestroy, signal, computed, inject, SecurityContext,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -21,7 +20,7 @@ import { HistoryEntry, STORAGE_KEYS } from '../shared/models/history-entry.model
 @Component({
   selector: 'app-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastComponent, MarkdownEditorComponent, SiteHeaderComponent],
+  imports: [FormsModule, ToastComponent, MarkdownEditorComponent, SiteHeaderComponent],
   host: { '[class.dark-mode]': 'darkModeService.darkMode()' },
   template: `
 <app-site-header activePage="editor"></app-site-header>
