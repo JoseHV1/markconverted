@@ -107,7 +107,7 @@ import { Toast, ToastService } from './toast.service';
       border: none;
       border-radius: 4px;
       background: transparent;
-      color: #3a6385;
+      color: #7aa3c0;
       cursor: pointer;
       font-size: 1rem;
       transition: background 150ms, color 150ms;

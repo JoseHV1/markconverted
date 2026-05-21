@@ -1,6 +1,7 @@
 ﻿import {
   Component, OnInit, OnDestroy, signal, computed, inject, SecurityContext,
 } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -531,7 +532,20 @@ import { HistoryEntry, STORAGE_KEYS } from '../shared/models/history-entry.model
       .stats-bar { padding: 0 16px; gap: 8px; }
       .stats-left { gap: 8px; }
       .stat-div { display: none; }
-      .filename-input { min-width: 100px; }
+      .filename-input { min-width: 100px; max-width: 140px; }
+
+      .panels-row { flex-direction: column; }
+      .panel-left { flex: 0 0 45vh; border-right: none; border-bottom: 1px solid #c2c6d4; }
+      .panel-right { flex: 1 1 0; min-height: 0; }
+      .resize-handle { display: none; }
+    }
+
+    :host.dark-mode .panel-left { border-bottom-color: #143558; }
+
+    @media (max-width: 480px) {
+      .stat { font-size: 0.75rem; }
+      .stat-num { font-size: 0.75rem; }
+      .toolbar-btn { padding: 0 10px; font-size: 0.75rem; }
     }
   `],
 })
@@ -561,6 +575,8 @@ export class EditorComponent implements OnInit, OnDestroy {
   wordCount = 0; charCount = 0; lineCount = 0; readingTime = 0;
   private previewTimer: ReturnType<typeof setTimeout> | null = null;
   private restoreTimer: ReturnType<typeof setTimeout> | null = null;
+  private copiedTimer: ReturnType<typeof setTimeout> | null = null;
+  private convertSub: Subscription | null = null;
 
   get isFileInput(): boolean { return this.opt?.inputType === 'pdf' || this.opt?.inputType === 'docx'; }
   get isLive(): boolean { return this.opt?.outputType === 'html' && this.opt?.inputType === 'markdown'; }
@@ -665,17 +681,16 @@ export class EditorComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const pending = localStorage.getItem(STORAGE_KEYS.pendingRestore);
-    if (pending) {
-      localStorage.removeItem(STORAGE_KEYS.pendingRestore);
-      try {
+    try {
+      const pending = localStorage.getItem(STORAGE_KEYS.pendingRestore);
+      if (pending) {
+        localStorage.removeItem(STORAGE_KEYS.pendingRestore);
         const entry = JSON.parse(pending) as HistoryEntry;
         if (entry.type === this.opt.value) {
-          // MarkdownEditorComponent needs one tick to mount before accepting value
           this.restoreTimer = setTimeout(() => this.onMarkdownChange(entry.input), 100);
         }
-      } catch { /* ignore */ }
-    }
+      }
+    } catch { /* ignore */ }
 
     document.addEventListener('keydown', this.onKeydown);
     document.addEventListener('mousemove', this.onMouseMove);
@@ -688,6 +703,8 @@ export class EditorComponent implements OnInit, OnDestroy {
     document.removeEventListener('mouseup', this.onMouseUp);
     if (this.previewTimer) clearTimeout(this.previewTimer);
     if (this.restoreTimer) clearTimeout(this.restoreTimer);
+    if (this.copiedTimer) clearTimeout(this.copiedTimer);
+    this.convertSub?.unsubscribe();
   }
 
   clearInput(): void {
@@ -799,7 +816,8 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.errorMsg.set(null);
     const source: string | File = this.isFileInput ? this.uploadedFile()! : this.markdownText();
 
-    this.converterService.convert(opt.value, source).subscribe({
+    this.convertSub?.unsubscribe();
+    this.convertSub = this.converterService.convert(opt.value, source).subscribe({
       next: (res) => {
         this.loading.set(false);
         if (opt.outputType === 'pdf' || opt.outputType === 'docx' || opt.outputType === 'epub') {
@@ -849,7 +867,8 @@ export class EditorComponent implements OnInit, OnDestroy {
     if (!content || content === '__binary__') return;
     navigator.clipboard.writeText(content).then(() => {
       this.copied.set(true);
-      setTimeout(() => this.copied.set(false), 2000);
+      if (this.copiedTimer) clearTimeout(this.copiedTimer);
+      this.copiedTimer = setTimeout(() => this.copied.set(false), 2000);
     });
   }
 
@@ -872,8 +891,10 @@ export class EditorComponent implements OnInit, OnDestroy {
       input: input.slice(0, 10_000),
       timestamp: Date.now(),
     };
-    const existing: HistoryEntry[] = JSON.parse(localStorage.getItem(STORAGE_KEYS.history) ?? '[]');
-    localStorage.setItem(STORAGE_KEYS.history, JSON.stringify([entry, ...existing].slice(0, 50)));
+    try {
+      const existing: HistoryEntry[] = JSON.parse(localStorage.getItem(STORAGE_KEYS.history) ?? '[]');
+      localStorage.setItem(STORAGE_KEYS.history, JSON.stringify([entry, ...existing].slice(0, 50)));
+    } catch { /* ignore */ }
   }
 
   private classifyError(err: { status?: number; error?: { message?: string } }): { title: string; message: string } {

@@ -206,6 +206,7 @@ export type ActivePage = 'tools' | 'editor' | 'history';
     @media (max-width: 768px) {
       .header-inner { padding: 0 20px; }
       .nav-hamburger { display: flex; }
+      .nav-install-btn { display: none; }
     }
   `],
 })
