@@ -1,5 +1,4 @@
 ﻿import { Component, OnInit, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 
 import { CONVERSION_ICONS, CONVERSION_META } from '../converter/models/converter.meta';
@@ -11,7 +10,7 @@ import { HistoryEntry, STORAGE_KEYS } from '../shared/models/history-entry.model
 @Component({
   selector: 'app-history',
   standalone: true,
-  imports: [CommonModule, RouterLink, SiteHeaderComponent, SiteFooterComponent],
+  imports: [RouterLink, SiteHeaderComponent, SiteFooterComponent],
   host: { '[class.dark-mode]': 'darkModeService.darkMode()' },
   template: `
   <app-site-header activePage="history"></app-site-header>

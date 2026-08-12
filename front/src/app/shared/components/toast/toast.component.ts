@@ -1,11 +1,10 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Toast, ToastService } from './toast.service';
 
 @Component({
   selector: 'app-toast',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
 <div class="toast-stack" aria-live="polite" aria-atomic="false" aria-label="Notifications">
   @for (toast of toastService.toasts(); track toast.id) {
@@ -108,7 +107,7 @@ import { Toast, ToastService } from './toast.service';
       border: none;
       border-radius: 4px;
       background: transparent;
-      color: #3a6385;
+      color: #7aa3c0;
       cursor: pointer;
       font-size: 1rem;
       transition: background 150ms, color 150ms;

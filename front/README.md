@@ -15,4 +15,4 @@ ng build        # production build → dist/markconvert-front/browser
 | File | Used for |
 |------|----------|
 | `environment.ts` | Local dev — points to `http://localhost:3001/api/v1` |
-| `environment.prod.ts` | Production — uses relative `/api/v1` (same Vercel domain) |
+| `environment.prod.ts` | Production — uses relative `/api/v1`|

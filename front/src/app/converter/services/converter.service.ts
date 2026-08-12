@@ -17,7 +17,7 @@ export class ConverterService {
       formData.append('content', source);
     }
 
-    if (type === 'md-to-pdf' || type === 'md-to-docx') {
+    if (type === 'md-to-pdf' || type === 'md-to-docx' || type === 'md-to-epub') {
       return this.http.post(`${this.baseUrl}/${type}`, formData, { responseType: 'arraybuffer' });
     }
     return this.http.post<{ result: string }>(`${this.baseUrl}/${type}`, formData);

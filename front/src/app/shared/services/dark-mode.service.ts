@@ -6,7 +6,8 @@ export class DarkModeService {
   readonly darkMode = signal(false);
 
   constructor() {
-    const stored = localStorage.getItem(STORAGE_KEYS.darkMode) === 'true';
+    let stored = false;
+    try { stored = localStorage.getItem(STORAGE_KEYS.darkMode) === 'true'; } catch { /* ignore */ }
     this.darkMode.set(stored);
     document.body.classList.toggle('dark-mode', stored);
   }
@@ -14,7 +15,7 @@ export class DarkModeService {
   toggle(): void {
     const next = !this.darkMode();
     this.darkMode.set(next);
-    localStorage.setItem(STORAGE_KEYS.darkMode, String(next));
+    try { localStorage.setItem(STORAGE_KEYS.darkMode, String(next)); } catch { /* ignore */ }
     document.body.classList.toggle('dark-mode', next);
   }
 }
