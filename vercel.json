@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "front/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist/markconvert-front/browser" }
+    },
+    {
+      "src": "back/api/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/back/api/index.ts" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ],
+  "functions": {
+    "back/api/index.ts": { "maxDuration": 60, "memory": 1024 }
+  }
+}
