@@ -1,8 +1,7 @@
 import { Injectable, InternalServerErrorException, BadRequestException, Logger } from '@nestjs/common';
 import { Marked, Renderer } from 'marked';
 import TurndownService from 'turndown';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse: (buf: Buffer) => Promise<{ text: string }> = require('pdf-parse/lib/pdf-parse.js');
+import { PDFParse } from 'pdf-parse';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const HTMLtoDOCX = require('html-to-docx');
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -98,7 +97,8 @@ export class ConverterService {
   async pdfToMd(pdfBuffer: Buffer): Promise<string> {
     let data: { text: string };
     try {
-      data = await pdfParse(pdfBuffer);
+      const parser = new PDFParse({ data: pdfBuffer });
+      data = await parser.getText();
     } catch (err) {
       this.logger.error('PDF parse failed', err);
       throw new InternalServerErrorException(

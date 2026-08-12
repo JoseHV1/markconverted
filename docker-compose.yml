@@ -1,0 +1,17 @@
+services:
+  back:
+    build:
+      context: ./back
+    environment:
+      - PORT=3010
+      - CORS_ORIGIN=${CORS_ORIGIN:-https://markconverted.zapto.org}
+    ports:
+      - "3012:3010"
+    restart: unless-stopped
+
+  front:
+    build:
+      context: ./front
+    ports:
+      - "3013:80"
+    restart: unless-stopped
