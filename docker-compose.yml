@@ -4,7 +4,7 @@ services:
       context: ./back
     environment:
       - PORT=3010
-      - CORS_ORIGIN=${CORS_ORIGIN:-https://markconverted.zapto.org}
+      - CORS_ORIGIN=${CORS_ORIGIN:-https://markconverted.jose-hernandez.dev}
     ports:
       - "3012:3010"
     restart: unless-stopped
