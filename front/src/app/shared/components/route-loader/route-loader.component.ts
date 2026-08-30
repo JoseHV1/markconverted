@@ -1,5 +1,12 @@
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
-import { Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
+import {
+  Router,
+  NavigationStart,
+  NavigationEnd,
+  NavigationCancel,
+  NavigationError,
+  NavigationSkipped,
+} from '@angular/router';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -45,7 +52,8 @@ export class RouteLoaderComponent implements OnInit, OnDestroy {
       } else if (
         event instanceof NavigationEnd ||
         event instanceof NavigationCancel ||
-        event instanceof NavigationError
+        event instanceof NavigationError ||
+        event instanceof NavigationSkipped
       ) {
         this.loading.set(false);
       }
