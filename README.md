@@ -7,7 +7,7 @@ Document converter for developers and writers. Convert between Markdown, HTML, P
 ```
 markconverted/
 ├── front/   Angular 20 SPA
-└── back/    NestJS 11 API (serverless via Vercel)
+└── back/    NestJS 11 API
 ```
 
 ## Local development
@@ -32,14 +32,12 @@ The Angular dev server proxies API calls to `http://localhost:3001` via `environ
 
 | Input | Output |
 |-------|--------|
-| Markdown | HTML, TXT, PDF, DOCX, EPUB |
+| Markdown | HTML, TXT, PDF, DOCX |
 | PDF | Markdown |
 | HTML | Markdown |
 | DOCX | Markdown |
+| Image | Markdown |
 
 ## Deployment
 
-Deployed as a monorepo on Vercel. The root `vercel.json` wires the Angular SPA and the NestJS serverless function together under a single domain.
-
-Set the following environment variable in Vercel:
-- `CORS_ORIGIN` — your Vercel deployment URL (or `*` for open access)
+See [DEPLOY.md](./DEPLOY.md) for the Docker Compose / Coolify deployment setup.

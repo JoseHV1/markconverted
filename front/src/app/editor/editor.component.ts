@@ -89,14 +89,14 @@ import { HistoryEntry, STORAGE_KEYS } from '../shared/models/history-entry.model
           <div class="drop-zone"
                [class.drag-over]="isDragging()"
                tabindex="0" role="button"
-               [attr.aria-label]="opt.inputType === 'docx' ? 'Drop DOCX or click to browse' : 'Drop PDF or click to browse'"
+               [attr.aria-label]="'Drop ' + inputLabel + ' or click to browse'"
                (click)="fileInput.click()"
                (keydown.enter)="fileInput.click()"
                (dragover)="$event.preventDefault(); isDragging.set(true)"
                (dragleave)="isDragging.set(false)"
                (drop)="onDrop($event)">
             @if (uploadedFile()) {
-              <i class="bi {{ opt.inputType === 'docx' ? 'bi-file-earmark-word-fill' : 'bi-file-earmark-pdf-fill' }} dz-icon {{ opt.inputType === 'docx' ? 'docx-icon' : 'pdf-icon' }}" aria-hidden="true"></i>
+              <i class="bi {{ dropZoneIconClass }} dz-icon" aria-hidden="true"></i>
               <p class="dz-filename">{{ uploadedFile()!.name }}</p>
               <span class="dz-size">{{ formatSize(uploadedFile()!.size) }}</span>
               <button class="secondary-btn" style="margin-top:8px" (click)="$event.stopPropagation(); fileInput.click()">
@@ -104,7 +104,7 @@ import { HistoryEntry, STORAGE_KEYS } from '../shared/models/history-entry.model
               </button>
             } @else {
               <i class="bi bi-cloud-arrow-up dz-icon dz-icon-empty" aria-hidden="true"></i>
-              <p class="dz-label">{{ opt.inputType === 'docx' ? 'Drop your DOCX here' : 'Drop your PDF here' }}</p>
+              <p class="dz-label">{{ dropZoneLabel }}</p>
               <span class="dz-hint">or click to browse · max 20 MB</span>
               <button class="secondary-btn" style="margin-top:12px" (click)="$event.stopPropagation(); fileInput.click()">
                 <i class="bi bi-folder2-open"></i> Choose file
@@ -116,7 +116,7 @@ import { HistoryEntry, STORAGE_KEYS } from '../shared/models/history-entry.model
               </div>
             }
             <input #fileInput type="file"
-                   [accept]="opt.inputType === 'docx' ? '.docx,.doc' : '.pdf'"
+                   [accept]="dropZoneAccept"
                    class="sr-only" aria-hidden="true"
                    (change)="onFileChange($event)" />
           </div>
@@ -164,7 +164,7 @@ import { HistoryEntry, STORAGE_KEYS } from '../shared/models/history-entry.model
                    (ngModelChange)="outputFilename.set($event)"
                    [placeholder]="defaultFilename()"
                    aria-label="Output filename" />
-            @if (opt.outputType !== 'pdf' && opt.outputType !== 'docx' && opt.outputType !== 'epub') {
+            @if (opt.outputType !== 'pdf' && opt.outputType !== 'docx') {
               <button class="icon-btn" [class.icon-btn-success]="copied()" (click)="copyResult()"
                       [attr.aria-label]="copied() ? 'Copied!' : 'Copy to clipboard'">
                 <i class="bi" [class.bi-clipboard]="!copied()" [class.bi-clipboard-check-fill]="copied()" aria-hidden="true"></i>
@@ -190,7 +190,7 @@ import { HistoryEntry, STORAGE_KEYS } from '../shared/models/history-entry.model
             {{ errorMsg() }}
           </div>
         } @else if (result()) {
-          @if (opt.outputType === 'pdf' || opt.outputType === 'docx' || opt.outputType === 'epub') {
+          @if (opt.outputType === 'pdf' || opt.outputType === 'docx') {
             <div class="panel-state">
               <i class="bi bi-file-earmark-check-fill state-check"
                  [style.color]="meta[opt.value].fg" aria-hidden="true"></i>
@@ -429,8 +429,9 @@ import { HistoryEntry, STORAGE_KEYS } from '../shared/models/history-entry.model
     }
     .dz-icon { font-size: 3rem; margin-bottom: 14px; }
     .dz-icon-empty { color: #c2c6d4; }
-    .pdf-icon  { color: #ba1a1a; }
-    .docx-icon { color: #003f87; }
+    .pdf-icon   { color: #ba1a1a; }
+    .docx-icon  { color: #003f87; }
+    .image-icon { color: #b45309; }
     .dz-filename { font-weight: 600; color: #191c1d; margin: 0 0 4px; word-break: break-all; transition: color 250ms; }
     .dz-size { display: block; color: #16a34a; font-size: 0.85rem; font-weight: 500; }
     .dz-label { font-weight: 600; color: #191c1d; margin: 0 0 6px; font-size: 1rem; transition: color 250ms; }
@@ -577,25 +578,54 @@ export class EditorComponent implements OnInit, OnDestroy {
   private restoreTimer: ReturnType<typeof setTimeout> | null = null;
   private copiedTimer: ReturnType<typeof setTimeout> | null = null;
   private convertSub: Subscription | null = null;
+  private routeSub: Subscription | null = null;
 
-  get isFileInput(): boolean { return this.opt?.inputType === 'pdf' || this.opt?.inputType === 'docx'; }
+  get isFileInput(): boolean {
+    return this.opt?.inputType === 'pdf' || this.opt?.inputType === 'docx' || this.opt?.inputType === 'image';
+  }
   get isLive(): boolean { return this.opt?.outputType === 'html' && this.opt?.inputType === 'markdown'; }
 
   get inputLabel(): string {
     switch (this.opt?.inputType) {
-      case 'pdf':  return 'PDF File';
-      case 'docx': return 'DOCX File';
-      case 'html': return 'HTML Input';
-      default:     return 'Markdown Input';
+      case 'pdf':   return 'PDF File';
+      case 'docx':  return 'DOCX File';
+      case 'image': return 'Image File';
+      case 'html':  return 'HTML Input';
+      default:      return 'Markdown Input';
     }
   }
 
   get inputIcon(): string {
     switch (this.opt?.inputType) {
-      case 'pdf':  return 'bi-file-earmark-pdf-fill';
-      case 'docx': return 'bi-file-earmark-word-fill';
-      case 'html': return 'bi-filetype-html';
-      default:     return 'bi-markdown-fill';
+      case 'pdf':   return 'bi-file-earmark-pdf-fill';
+      case 'docx':  return 'bi-file-earmark-word-fill';
+      case 'image': return 'bi-file-earmark-image-fill';
+      case 'html':  return 'bi-filetype-html';
+      default:      return 'bi-markdown-fill';
+    }
+  }
+
+  get dropZoneAccept(): string {
+    switch (this.opt?.inputType) {
+      case 'docx':  return '.docx,.doc';
+      case 'image': return '.png,.jpg,.jpeg,.webp,.gif,.bmp';
+      default:      return '.pdf';
+    }
+  }
+
+  get dropZoneIconClass(): string {
+    switch (this.opt?.inputType) {
+      case 'docx':  return 'bi-file-earmark-word-fill docx-icon';
+      case 'image': return 'bi-file-earmark-image-fill image-icon';
+      default:      return 'bi-file-earmark-pdf-fill pdf-icon';
+    }
+  }
+
+  get dropZoneLabel(): string {
+    switch (this.opt?.inputType) {
+      case 'docx':  return 'Drop your DOCX here';
+      case 'image': return 'Drop your image here';
+      default:      return 'Drop your PDF here';
     }
   }
 
@@ -604,24 +634,29 @@ export class EditorComponent implements OnInit, OnDestroy {
     return this.isFileInput ? !!this.uploadedFile() : this.markdownText().trim().length > 0;
   });
 
-  readonly defaultFilename = computed(() => `converted.${this.opt?.outputExtension ?? 'txt'}`);
+  // Plain methods, not computed(): they only read the non-signal `opt` property,
+  // so a computed() here would memoize on first read and never reflect a later
+  // conversion-type switch (opt is reassigned by applyConversionType(), not a signal write).
+  defaultFilename(): string {
+    return `converted.${this.opt?.outputExtension ?? 'txt'}`;
+  }
 
-  readonly outputIcon = computed(() => {
+  outputIcon(): string {
     const map: Record<string, string> = {
       html: 'bi-code-slash', txt: 'bi-file-text-fill',
       pdf: 'bi-file-earmark-pdf-fill', docx: 'bi-file-earmark-word-fill',
-      epub: 'bi-book-half', md: 'bi-markdown-fill',
+      md: 'bi-markdown-fill',
     };
     return map[this.opt?.outputType ?? ''] ?? 'bi-file';
-  });
+  }
 
-  readonly outputLabel = computed(() => {
+  outputLabel(): string {
     const map: Record<string, string> = {
       html: 'HTML Output', txt: 'Plain Text', pdf: 'PDF Output',
-      docx: 'DOCX Output', epub: 'EPUB Output', md: 'Markdown Output',
+      docx: 'DOCX Output', md: 'Markdown Output',
     };
     return map[this.opt?.outputType ?? ''] ?? 'Output';
-  });
+  }
 
   readonly safeHtmlResult = computed(() => {
     const r = this.result();
@@ -643,7 +678,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     'md-to-txt':   { title: 'TXT ready!',      message: 'Plain text output is ready.'                   },
     'md-to-pdf':   { title: 'PDF ready!',      message: 'Your PDF has been downloaded.'                 },
     'md-to-docx':  { title: 'DOCX ready!',     message: 'Your Word document has been downloaded.'       },
-    'md-to-epub':  { title: 'EPUB ready!',     message: 'Your EPUB ebook has been downloaded.'          },
+    'image-to-md': { title: 'Markdown ready!', message: 'Text extracted from the image as Markdown.'    },
     'pdf-to-md':   { title: 'Markdown ready!', message: 'PDF text has been extracted as Markdown.'      },
     'html-to-md':  { title: 'Markdown ready!', message: 'HTML has been converted to Markdown.'          },
     'docx-to-md':  { title: 'Markdown ready!', message: 'Word document has been converted to Markdown.' },
@@ -674,23 +709,9 @@ export class EditorComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
-    const type = this.route.snapshot.queryParamMap.get('type') as ConversionType | null;
-    this.opt = CONVERSION_OPTIONS.find(o => o.value === type) ?? null;
-    if (!this.opt) {
-      this.router.navigate(['/']);
-      return;
-    }
-
-    try {
-      const pending = localStorage.getItem(STORAGE_KEYS.pendingRestore);
-      if (pending) {
-        localStorage.removeItem(STORAGE_KEYS.pendingRestore);
-        const entry = JSON.parse(pending) as HistoryEntry;
-        if (entry.type === this.opt.value) {
-          this.restoreTimer = setTimeout(() => this.onMarkdownChange(entry.input), 100);
-        }
-      }
-    } catch { /* ignore */ }
+    this.routeSub = this.route.queryParamMap.subscribe((params) => {
+      this.applyConversionType(params.get('type') as ConversionType | null);
+    });
 
     document.addEventListener('keydown', this.onKeydown);
     document.addEventListener('mousemove', this.onMouseMove);
@@ -705,9 +726,59 @@ export class EditorComponent implements OnInit, OnDestroy {
     if (this.restoreTimer) clearTimeout(this.restoreTimer);
     if (this.copiedTimer) clearTimeout(this.copiedTimer);
     this.convertSub?.unsubscribe();
+    this.routeSub?.unsubscribe();
+  }
+
+  private applyConversionType(type: ConversionType | null): void {
+    const nextOpt = CONVERSION_OPTIONS.find(o => o.value === type) ?? null;
+    if (!nextOpt) {
+      this.router.navigate(['/']);
+      return;
+    }
+
+    const isTypeChange = this.opt !== null && this.opt.value !== nextOpt.value;
+    this.opt = nextOpt;
+    if (isTypeChange) this.resetEditorState();
+
+    try {
+      const pending = localStorage.getItem(STORAGE_KEYS.pendingRestore);
+      if (pending) {
+        localStorage.removeItem(STORAGE_KEYS.pendingRestore);
+        const entry = JSON.parse(pending) as HistoryEntry;
+        if (entry.type === this.opt.value) {
+          this.restoreTimer = setTimeout(() => this.onMarkdownChange(entry.input), 100);
+        }
+      }
+    } catch { /* ignore */ }
+  }
+
+  private resetEditorState(): void {
+    if (this.restoreTimer) { clearTimeout(this.restoreTimer); this.restoreTimer = null; }
+    if (this.previewTimer) { clearTimeout(this.previewTimer); this.previewTimer = null; }
+    if (this.copiedTimer) { clearTimeout(this.copiedTimer); this.copiedTimer = null; }
+    this.cancelInFlightConvert();
+    this.markdownText.set('');
+    this.uploadedFile.set(null);
+    this.result.set(null);
+    this.pdfData.set(null);
+    this.errorMsg.set(null);
+    this.livePreview.set(null);
+    this.previewMode.set('preview');
+    this.outputFilename.set('');
+    this.copied.set(false);
+    this.wordCount = 0; this.charCount = 0; this.lineCount = 0; this.readingTime = 0;
+  }
+
+  // A response for `source` at request time is meaningless once the input has moved on —
+  // cancelling here also aborts the underlying HTTP request, not just the local state update.
+  private cancelInFlightConvert(): void {
+    this.convertSub?.unsubscribe();
+    this.convertSub = null;
+    this.loading.set(false);
   }
 
   clearInput(): void {
+    this.cancelInFlightConvert();
     this.markdownText.set('');
     this.result.set(null);
     this.errorMsg.set(null);
@@ -716,6 +787,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   onMarkdownChange(text: string): void {
+    this.cancelInFlightConvert();
     this.markdownText.set(text);
     const trimmed = text.trim();
     this.wordCount   = trimmed ? trimmed.split(/\s+/).length : 0;
@@ -739,7 +811,7 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   onFileChange(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
-    if (file) this.setFile(file);
+    if (file) this.tryAcceptFile(file);
   }
 
   onDrop(event: DragEvent): void {
@@ -747,17 +819,43 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.isDragging.set(false);
     const file = event.dataTransfer?.files[0];
     if (!file) return;
-    const isDocx = this.opt?.inputType === 'docx';
-    const validDocx = [
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/msword',
-    ];
-    if (isDocx ? validDocx.includes(file.type) : file.type === 'application/pdf') {
-      this.setFile(file);
+    this.tryAcceptFile(file);
+  }
+
+  // Single gate for both the Browse dialog and drag-and-drop, so a file rejected by one
+  // door can't slip through the other.
+  private tryAcceptFile(file: File): void {
+    if (!this.isValidFile(file)) {
+      this.toastService.warning(this.invalidFileMessage(), 'Unsupported file type');
+      return;
+    }
+    this.setFile(file);
+  }
+
+  private isValidFile(file: File): boolean {
+    switch (this.opt?.inputType) {
+      case 'docx':
+        return [
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'application/msword',
+        ].includes(file.type);
+      case 'image':
+        return file.type.startsWith('image/');
+      default:
+        return file.type === 'application/pdf';
+    }
+  }
+
+  private invalidFileMessage(): string {
+    switch (this.opt?.inputType) {
+      case 'docx':  return 'Only .docx and .doc files are supported.';
+      case 'image': return 'Only image files (PNG, JPG, WEBP, etc.) are supported.';
+      default:      return 'Only PDF files are supported.';
     }
   }
 
   private setFile(file: File): void {
+    this.cancelInFlightConvert();
     this.uploadedFile.set(file);
     this.result.set(null);
     this.errorMsg.set(null);
@@ -820,7 +918,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.convertSub = this.converterService.convert(opt.value, source).subscribe({
       next: (res) => {
         this.loading.set(false);
-        if (opt.outputType === 'pdf' || opt.outputType === 'docx' || opt.outputType === 'epub') {
+        if (opt.outputType === 'pdf' || opt.outputType === 'docx') {
           const buf = res as ArrayBuffer;
           this.pdfData.set(buf);
           this.triggerDownload(buf, opt);
@@ -853,7 +951,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   download(): void {
     const opt = this.opt;
     if (!opt) return;
-    if (opt.outputType === 'pdf' || opt.outputType === 'docx' || opt.outputType === 'epub') {
+    if (opt.outputType === 'pdf' || opt.outputType === 'docx') {
       const buf = this.pdfData();
       if (buf) this.triggerDownload(buf, opt);
     } else {

@@ -31,3 +31,6 @@ npm-debug.log*
 
 # TypeScript
 *.tsbuildinfo
+
+# Tesseract OCR language data (auto-downloaded at runtime by tesseract.js)
+*.traineddata

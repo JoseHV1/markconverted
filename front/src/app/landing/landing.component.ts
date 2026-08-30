@@ -19,7 +19,7 @@ import { SiteFooterComponent } from '../shared/components/site-footer/site-foote
     <h1 class="hero-title">Convert documents instantly</h1>
     <p class="hero-subtitle">The document converter for developers and writers</p>
     <p class="hero-sub">
-      Markdown → HTML, TXT, PDF or DOCX · PDF → Markdown · HTML → Markdown.<br>
+      Markdown → HTML, TXT, PDF or DOCX · PDF, DOCX, HTML or Image → Markdown.<br>
       No signup, no watermarks, no file storage.
     </p>
   </div>
@@ -41,7 +41,7 @@ import { SiteFooterComponent } from '../shared/components/site-footer/site-foote
           <span class="tool-desc">{{ meta[opt.value].desc }}</span>
           <div class="tool-card-footer">
             <span class="tool-open-link">
-              {{ opt.inputType === 'pdf' || opt.inputType === 'docx' ? 'Upload File' : 'Open Editor' }}
+              {{ opt.inputType === 'pdf' || opt.inputType === 'docx' || opt.inputType === 'image' ? 'Upload File' : 'Open Editor' }}
               <i class="bi bi-arrow-right" aria-hidden="true"></i>
             </span>
           </div>

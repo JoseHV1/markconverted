@@ -2,12 +2,11 @@ import { Injectable, InternalServerErrorException, BadRequestException, Logger }
 import { Marked, Renderer } from 'marked';
 import TurndownService from 'turndown';
 import { PDFParse } from 'pdf-parse';
+import { createWorker } from 'tesseract.js';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const HTMLtoDOCX = require('html-to-docx');
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const mammoth = require('mammoth') as { convertToHtml(input: { buffer: Buffer }): Promise<{ value: string }> };
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { EPub } = require('epub-gen-memory') as { EPub: new (opts: object, chapters: object[]) => { genEpub(): Promise<Buffer> } };
 import * as puppeteer from 'puppeteer-core';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const chromium = require('@sparticuz/chromium') as {
@@ -129,21 +128,28 @@ export class ConverterService {
     return this.htmlToMd(html);
   }
 
-  async mdToEpub(markdown: string): Promise<Buffer> {
-    const titleMatch = markdown.match(/^# (.+)/m);
-    const bookTitle = titleMatch ? titleMatch[1].trim() : 'Document';
-    const chapters = this.splitIntoEpubChapters(markdown);
+  async imageToMd(imageBuffer: Buffer): Promise<string> {
+    let text: string;
     try {
-      const epub = new EPub(
-        { title: bookTitle, author: 'MarkConvert', lang: 'en', appendChapterTitles: false },
-        chapters,
-      );
-      const buffer = await epub.genEpub();
-      return Buffer.from(buffer);
+      const worker = await createWorker('eng');
+      try {
+        const { data } = await worker.recognize(imageBuffer);
+        text = data.text;
+      } finally {
+        await worker.terminate();
+      }
     } catch (err) {
-      this.logger.error('EPUB generation failed', err);
-      throw new InternalServerErrorException('EPUB generation failed');
+      this.logger.error('OCR failed', err);
+      throw new InternalServerErrorException('Could not extract text from the image.');
     }
+
+    const extracted = text.trim();
+    if (!extracted || extracted.length < 3) {
+      throw new BadRequestException(
+        'No readable text found in this image. Try a clearer or higher-resolution image.',
+      );
+    }
+    return this.textToMarkdown(extracted);
   }
 
   async htmlToMd(html: string): Promise<string> {
@@ -153,22 +159,6 @@ export class ConverterService {
       this.logger.error('HTML to Markdown conversion failed', err);
       throw new InternalServerErrorException('HTML to Markdown conversion failed');
     }
-  }
-
-  private splitIntoEpubChapters(markdown: string): Array<{ title: string; content: string }> {
-    const mapSections = (sections: string[], regex: RegExp, fallback: string) =>
-      sections.map(section => {
-        const match = section.match(regex);
-        return { title: match ? match[1].trim() : fallback, content: this.marked.parse(section) as string };
-      });
-
-    const h1Sections = markdown.split(/(?=^# )/m).filter(s => s.trim());
-    if (h1Sections.length > 1) return mapSections(h1Sections, /^# (.+)/, 'Chapter');
-
-    const h2Sections = markdown.split(/(?=^## )/m).filter(s => s.trim());
-    if (h2Sections.length > 1) return mapSections(h2Sections, /^## (.+)/, 'Section');
-
-    return [{ title: 'Content', content: this.marked.parse(markdown) as string }];
   }
 
   private buildTxtMarked(): Marked {

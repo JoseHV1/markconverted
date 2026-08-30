@@ -15,12 +15,6 @@ export type ActivePage = 'tools' | 'editor' | 'history';
   <div class="header-inner">
 
     <a class="logo" [routerLink]="['/']" aria-label="MarkConvert home">
-      <svg class="logo-icon" viewBox="0 0 680 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect width="680" height="512" rx="90" fill="#003d80"/>
-        <path fill="white" d="M252 108H218Q168 108 168 158V224Q168 256 132 256Q168 256 168 288V354Q168 404 218 404H252V374H228Q198 374 198 354V292Q198 270 172 256Q198 242 198 220V158Q198 138 228 138H252Z"/>
-        <path fill="white" d="M292 108H330L340 240L350 108H388V404H358V220L340 372L322 220V404H292Z"/>
-        <path fill="white" d="M428 108H462Q512 108 512 158V224Q512 256 548 256Q512 256 512 288V354Q512 404 462 404H428V374H452Q482 374 482 354V292Q482 270 508 256Q482 242 482 220V158Q482 138 452 138H428Z"/>
-      </svg>
       <span class="logo-name">MarkConvert</span>
     </a>
 
@@ -120,11 +114,9 @@ export type ActivePage = 'tools' | 'editor' | 'history';
     }
 
     .logo {
-      display: flex; align-items: center; gap: 10px;
+      display: flex; align-items: center;
       margin-right: 8px; flex-shrink: 0; text-decoration: none;
     }
-
-    .logo-icon { width: 58px; height: 44px; border-radius: 10px; display: block; flex-shrink: 0; }
 
     .logo-name {
       font-size: 1.0625rem; font-weight: 700;

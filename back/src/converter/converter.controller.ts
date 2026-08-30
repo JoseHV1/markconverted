@@ -74,21 +74,14 @@ export class ConverterController {
     res.end(docxBuffer);
   }
 
-  @Post('md-to-epub')
+  @Post('image-to-md')
   @UseInterceptors(FileInterceptor('file', memory))
-  async mdToEpub(
-    @Body('content') content: string,
-    @UploadedFile() file: Express.Multer.File,
-    @Res() res: Response,
-  ) {
-    const markdown = this.resolveText(content, file);
-    const epubBuffer = await this.converterService.mdToEpub(markdown);
-    res.set({
-      'Content-Type': 'application/epub+zip',
-      'Content-Disposition': 'attachment; filename="document.epub"',
-      'Content-Length': epubBuffer.length,
-    });
-    res.end(epubBuffer);
+  async imageToMd(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('Image file is required');
+    if (!file.mimetype.startsWith('image/'))
+      throw new BadRequestException('File must be an image (PNG, JPG, WEBP, etc.)');
+    const result = await this.converterService.imageToMd(file.buffer);
+    return { result };
   }
 
   @Post('html-to-md')
